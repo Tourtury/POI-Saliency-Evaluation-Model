@@ -1,0 +1,68 @@
+import tensorflow as tf
+from tensorflow import keras
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+tf.compat.v1.disable_eager_execution()
+
+Tarin_set = pd.read_csv(r'..\Tarin_set.csv')
+Test_set = pd.read_csv(r'..\Test_set.csv')
+
+Tarin_set['L1'] = np.array(data['location'] ==1).astype(np.int32)
+Tarin_set['L2'] = np.array(data['location'] ==2).astype(np.int32)
+Tarin_set['L3'] = np.array(data['location'] ==3).astype(np.int32)
+Tarin_set['L4'] = np.array(Tarin_set['location'] ==4).astype(np.int32)
+Tarin_set['L5'] = np.array(Tarin_set['location'] ==5).astype(np.int32)
+del Tarin_set['location']
+
+Tarin_set['S1'] = np.array(Tarin_set['size'] ==1).astype(np.int32)
+Tarin_set['S2'] = np.array(Tarin_set['size'] ==2).astype(np.int32)
+Tarin_set['S3'] = np.array(Tarin_set['size'] ==3).astype(np.int32)
+del Tarin_set['size']
+
+Test_set['L1'] = np.array(Test_set['location'] ==1).astype(np.int32)
+Test_set['L2'] = np.array(Test_set['location'] ==2).astype(np.int32)
+Test_set['L3'] = np.array(Test_set['location'] ==3).astype(np.int32)
+Test_set['L4'] = np.array(Test_set['location'] ==4).astype(np.int32)
+Test_set['L5'] = np.array(Test_set['location'] ==5).astype(np.int32)
+del Test_set['location']
+
+Test_set['S1'] = np.array(Test_set['size'] ==1).astype(np.int32)
+Test_set['S2'] = np.array(Test_set['size'] ==2).astype(np.int32)
+Test_set['S3'] = np.array(Test_set['size'] ==3).astype(np.int32)
+del Test_set['size']
+
+x = Tarin_set.iloc[:, 1:]
+y = Tarin_set.iloc[:, 0]
+
+model = tf.keras.Sequential([tf.keras.layers.Dense(10, input_shape=(12,),activation='tanh'),
+                             tf.keras.layers.Dense(10, activation='tanh'),
+#                             tf.keras.layers.Dropout(0.01),
+                             tf.keras.layers.Dense(1)]
+                           )
+
+model.compile(
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.01),
+             loss='mse'
+             )
+
+history = model.fit(x, y, epochs=1000)
+Tarin_x = Test_set.iloc[:, 1:]
+Tarin_pre_y  = model.predict(Tarin_x)
+model.predict(Tarin_x)
+
+history.history.keys() #View the parameters in the training
+
+plt.plot(history.epoch, history.history.get('loss')) #Take out the loss value and draw a fold line with the training times
+
+Test_x = Test_set.iloc[:, 1:]
+Test_pre_y = model.predict(Test_x)
+model.predict(Test_x)
+
+model.save('Model')
+Load_model = keras.models.load_model('Model')
+Load_model.summary()
+
+# Load_model = keras.models.load_model('POI Salience Model (MLP)') #Load the trained model
+# Load_model.summary()
