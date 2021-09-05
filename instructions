@@ -1,0 +1,3 @@
+# The setup of the structure of this model and the training of the model are built on the Tensorflow 2.0 platform.
+# The code should be run on a computer with the Tensorflow platform installed
+# Computer environment configuration reference url Tensorflow2.0: www.tensorflow.org
