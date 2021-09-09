@@ -6,39 +6,43 @@ import matplotlib.pyplot as plt
 %matplotlib inline
 tf.compat.v1.disable_eager_execution()
 
-Tarin_set = pd.read_csv(r'..\Tarin_set.csv')
+#Load training set and test set data
+Train_set = pd.read_csv(r'..\Train_set.csv')
 Test_set = pd.read_csv(r'..\Test_set.csv')
 
-Tarin_set['L1'] = np.array(data['location'] ==1).astype(np.int32)
-Tarin_set['L2'] = np.array(data['location'] ==2).astype(np.int32)
-Tarin_set['L3'] = np.array(data['location'] ==3).astype(np.int32)
-Tarin_set['L4'] = np.array(Tarin_set['location'] ==4).astype(np.int32)
-Tarin_set['L5'] = np.array(Tarin_set['location'] ==5).astype(np.int32)
-del Tarin_set['location']
+#The data in the training set is processed by one-hot coding
+Train_set['L1'] = np.array(Train_set['Location'] ==1).astype(np.int32)
+Train_set['L2'] = np.array(Train_set['Location'] ==2).astype(np.int32)
+Train_set['L3'] = np.array(Train_set['Location'] ==3).astype(np.int32)
+Train_set['L4'] = np.array(Train_set['Location'] ==4).astype(np.int32)
+Train_set['L5'] = np.array(Train_set['Location'] ==5).astype(np.int32)
+del Train_set['Location']
 
-Tarin_set['S1'] = np.array(Tarin_set['size'] ==1).astype(np.int32)
-Tarin_set['S2'] = np.array(Tarin_set['size'] ==2).astype(np.int32)
-Tarin_set['S3'] = np.array(Tarin_set['size'] ==3).astype(np.int32)
-del Tarin_set['size']
+Train_set['S1'] = np.array(Train_set['Scale'] ==1).astype(np.int32)
+Train_set['S2'] = np.array(Train_set['Scale'] ==2).astype(np.int32)
+Train_set['S3'] = np.array(Train_set['Scale'] ==3).astype(np.int32)
+del Train_set['Scale']
 
-Test_set['L1'] = np.array(Test_set['location'] ==1).astype(np.int32)
-Test_set['L2'] = np.array(Test_set['location'] ==2).astype(np.int32)
-Test_set['L3'] = np.array(Test_set['location'] ==3).astype(np.int32)
-Test_set['L4'] = np.array(Test_set['location'] ==4).astype(np.int32)
-Test_set['L5'] = np.array(Test_set['location'] ==5).astype(np.int32)
-del Test_set['location']
+#The data in the test set is processed by one-hot coding
+Test_set['L1'] = np.array(Test_set['Location'] ==1).astype(np.int32)
+Test_set['L2'] = np.array(Test_set['Location'] ==2).astype(np.int32)
+Test_set['L3'] = np.array(Test_set['Location'] ==3).astype(np.int32)
+Test_set['L4'] = np.array(Test_set['Location'] ==4).astype(np.int32)
+Test_set['L5'] = np.array(Test_set['Location'] ==5).astype(np.int32)
+del Test_set['Location']
 
-Test_set['S1'] = np.array(Test_set['size'] ==1).astype(np.int32)
-Test_set['S2'] = np.array(Test_set['size'] ==2).astype(np.int32)
-Test_set['S3'] = np.array(Test_set['size'] ==3).astype(np.int32)
-del Test_set['size']
+Test_set['S1'] = np.array(Test_set['Scale'] ==1).astype(np.int32)
+Test_set['S2'] = np.array(Test_set['Scale'] ==2).astype(np.int32)
+Test_set['S3'] = np.array(Test_set['Scale'] ==3).astype(np.int32)
+del Test_set['Scale']
 
-x = Tarin_set.iloc[:, 1:]
-y = Tarin_set.iloc[:, 0]
+#Define X and Y in the training set
+x = Train_set.iloc[:, 1:]
+y = Train_set.iloc[:, 0]
 
+#Set the network model structure and training parameters(Activation function, Optimizer function, Loss function, Learn rate)
 model = tf.keras.Sequential([tf.keras.layers.Dense(10, input_shape=(12,),activation='tanh'),
                              tf.keras.layers.Dense(10, activation='tanh'),
-#                             tf.keras.layers.Dropout(0.01),
                              tf.keras.layers.Dense(1)]
                            )
 
@@ -47,22 +51,28 @@ model.compile(
              loss='mse'
              )
 
+#Set the number of network loop iterations and start model training
 history = model.fit(x, y, epochs=1000)
-Tarin_x = Test_set.iloc[:, 1:]
-Tarin_pre_y  = model.predict(Tarin_x)
-model.predict(Tarin_x)
 
+#The X in the training set is imported into the trained model, and the model values are output
+Train_x = Train_set.iloc[:, 1:]
+Train_pre_y  = model.predict(Train_x)
+print(Train_pre_y)
+
+#Use matplotlib to plot the change curve of the LOSS value with training, as shown in Figure 11
 history.history.keys() #View the parameters in the training
-
 plt.plot(history.epoch, history.history.get('loss')) #Take out the loss value and draw a fold line with the training times
 
+#Bring the X in the test set to the trained model, and output the model value of the test set
 Test_x = Test_set.iloc[:, 1:]
 Test_pre_y = model.predict(Test_x)
-model.predict(Test_x)
+print(Test_pre_y)
 
+#Save the trained model and output the model structure
 model.save('Model')
 Load_model = keras.models.load_model('Model')
 Load_model.summary()
 
-# Load_model = keras.models.load_model('POI Salience Model (MLP)') #Load the trained model
+# If you need to load the model from your computer, you can use the following code
+# Load_model = keras.models.load_model('Model') 
 # Load_model.summary()
