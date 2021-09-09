@@ -10,7 +10,7 @@ tf.compat.v1.disable_eager_execution()
 Train_set = pd.read_csv(r'..\Train_set.csv')
 Test_set = pd.read_csv(r'..\Test_set.csv')
 
-#The data in the training set is processed by one-hot coding
+#The data in the training set is processed by one-hot encoding
 Train_set['L1'] = np.array(Train_set['Location'] ==1).astype(np.int32)
 Train_set['L2'] = np.array(Train_set['Location'] ==2).astype(np.int32)
 Train_set['L3'] = np.array(Train_set['Location'] ==3).astype(np.int32)
